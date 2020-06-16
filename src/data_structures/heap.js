@@ -15,7 +15,7 @@ class MaxHeap {
       this._buildheap();
 
     } else {
-      this.size = size;
+      this._size = size;
 
       // Create storage array with sentinel
       this._storage = [null];
@@ -62,15 +62,43 @@ class MaxHeap {
   }
 
   _float(i) {
-    // TODO
+    let p = this._parent(i);
+    while (p > 0 && this._storage[p] < this._storage[i]) {
+      this._swap(i, p);
+
+      i = p;
+      p = this._parent(i);
+    }
   }
 
   _sink(i) {
-    // TODO
+    let finished = false
+    while(!finished) {
+      let l = this._left(i)
+      let r = this._right(i)
+
+      let max = i
+      if (l <= this._count && this._storage[l] > this._storage[max]) {
+        max = l;
+      }
+      if (r <= this._count && this._storage[r] > this._storage[max]) {
+        max = r;
+      }
+
+      if (max === i) {
+        finished = true;
+      } else {
+        this._swap(i, max);
+        i = max
+      }
+    }
   }
 
   _buildheap() {
-    // TODO
+    let mid = Math.floor(this._size / 2);
+    for (let i = mid; i > 0; i -= 1) {
+      this._sink(i);
+    }
   }
 
   /**
@@ -81,7 +109,14 @@ class MaxHeap {
    * @throws If the heap is full
    */
   insert(priority, element) {
-    // TODO
+    if (this._count < this._size) {
+      this._storage[this._count] = { priority: priority, element: element };
+      this._count += 1;
+      this._float(this._count)
+    }
+    else {
+      throw new Error("error");
+    }
   }
 
   /**
@@ -90,8 +125,18 @@ class MaxHeap {
    * @returns {*} The data stored in the highest-priority record, or undefined if the queue is empty
    */
   removeMax() {
-    // TODO
-  }
+    if (this._count === 0) {
+      return undefined;
+    }
+
+    let first = this._storage[1].element;
+    this._storage[1].element = undefined;
+
+    this._swap(1, this._count);
+    this._count -= 1;
+    this._sink(1);
+
+    return first;  }
 
   /** 
    * How many records are in the priority queue?
